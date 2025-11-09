@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正念來生之旅：你的選擇，你的未來</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定義字體設定，確保跨瀏覽器兼容性 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* 淺灰色背景 */
+            color: #333; /* 深色文字 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background-color: #fff; /* 白色遊戲容器背景 */
+            border-radius: 20px; /* 圓角 */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* 柔和陰影 */
+            padding: 30px;
+            max-width: 800px; /* 最大寬度 */
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 500px; /* 最小高度 */
+        }
+        .option-button {
+            background-color: #e2e8f0; /* 淺藍灰背景 */
+            color: #4a5568; /* 深藍灰文字 */
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            font-size: 1.1em;
+            line-height: 1.5;
+            border: 2px solid transparent; /* 預設無邊框 */
+        }
+        .option-button:hover {
+            background-color: #cbd5e0; /* 懸停時顏色變深 */
+            border-color: #a0aec0; /* 懸停時邊框顏色 */
+        }
+        .option-button:active {
+            background-color: #9eadb7; /* 點擊時顏色更深 */
+        }
+        .nav-button {
+            background-color: #4299e1; /* 藍色按鈕背景 */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .nav-button:hover {
+            background-color: #3182ce; /* 懸停時顏色變深 */
+        }
+        .nav-button:disabled {
+            background-color: #a0aec0; /* 禁用時顏色 */
+            cursor: not-allowed;
+        }
+        h1 {
+            color: #2b6cb0; /* 深藍色標題 */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #2d3748; /* 深灰文字 */
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .result-title {
+            color: #8b5cf6; /* 紫色結果標題 */
+            font-size: 2.2em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .result-description {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #4a5568;
+            background-color: #edf2f7; /* 淺背景框 */
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .hidden {
+            display: none;
+        }
+        /* 新增樣式，用於強調關鍵詞 */
+        strong {
+            color: #5a67d8; /* 深藍紫色 */
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer" class="game-container">
+        <!-- 遊戲開始畫面 -->
+        <div id="startScreen">
+            <h1 class="text-4xl font-extrabold mb-6">正念來生之旅：你的選擇，你的未來</h1>
+            <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+                這個遊戲結合《正法念處經》的智慧，透過20個生活情境的選擇，幫助你「預測」死亡後可能投生的境界。
+                請記住，這只是一個引導你反思自身行為與業報關係的工具，並非絕對的預言。
+                每一項選擇都代表著不同的業力傾向，最終累積的分數將揭示你的「來生境界」。
+            </p>
+            <button id="startButton" class="nav-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg">開始旅程</button>
+        </div>
+
+        <!-- 遊戲問題畫面 -->
+        <div id="questionScreen" class="hidden">
+            <p class="text-xl font-semibold text-blue-600 mb-4">題目 <span id="questionNumber">1</span> / 20</p>
+            <h2 id="questionText" class="text-2xl font-bold mb-8 text-gray-800 leading-relaxed"></h2>
+            <div id="optionsContainer" class="w-full">
+                <!-- 選項將由 JavaScript 動態加載 -->
+            </div>
+            <button id="nextButton" class="nav-button hidden bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg">下一題</button>
+        </div>
+
+        <!-- 遊戲結果畫面 -->
+        <div id="resultScreen" class="hidden">
+            <h2 class="result-title font-extrabold">你的來生境界預測</h2>
+            <p id="rebirthTitle" class="text-3xl font-bold text-indigo-700 mb-4"></p>
+            <p id="rebirthDescription" class="result-description text-xl text-gray-700"></p>
+            <!-- 新增的最終建議段落 -->
+            <p id="finalAdvice" class="text-lg text-gray-600 mt-6 leading-relaxed font-semibold">
+                無論結果如何，佛法教導我們：<strong>怖畏三惡趣之苦</strong>，是發心斷惡修善的動力；而<strong>堅信佛法僧三寶為究竟依怙</strong>，並<strong>精勤實踐善行</strong>，則是我們永不墮落惡趣、趣向解脫的兩大正因。願你常保正念，勤修善法！
+            </p>
+            <button id="restartButton" class="nav-button bg-purple-600 hover:bg-purple-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg">重新開始</button>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲元素獲取
+        const startScreen = document.getElementById('startScreen');
+        const questionScreen = document.getElementById('questionScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const startButton = document.getElementById('startButton');
+        const questionNumberSpan = document.getElementById('questionNumber');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const nextButton = document.getElementById('nextButton');
+        const rebirthTitle = document.getElementById('rebirthTitle');
+        const rebirthDescription = document.getElementById('rebirthDescription');
+        const restartButton = document.getElementById('restartButton');
+        const finalAdvice = document.getElementById('finalAdvice'); // 獲取新增的元素
+
+        // 遊戲狀態變量
+        let currentQuestionIndex = 0;
+        let totalScore = 0;
+        let selectedOptionScore = null; // 用於暫存當前選擇的分數
+
+        // 題目數據（20題，結合正法念處經的善惡業因）
+        const questions = [
+            {
+                question: "你在路上撿到一個裝滿錢包，裡面有很多現金和重要的證件。你會怎麼做？",
+                options: [
+                    { text: "立刻找到失主歸還，不求回報。", score: 3 },
+                    { text: "猶豫了一下，但最終還是交給警察。", score: 1 },
+                    { text: "偷偷收下現金，把證件扔掉。", score: -2 },
+                    { text: "完全佔為己有，並沾沾自喜。", score: -3 }
+                ]
+            },
+            {
+                question: "你的朋友遇到了困難，情緒非常低落，向你尋求幫助。你會怎麼做？",
+                options: [
+                    { text: "耐心傾聽，盡力提供實際的幫助和安慰。", score: 3 },
+                    { text: "雖然有點不耐煩，但還是敷衍地聽了聽。", score: 0 },
+                    { text: "覺得很煩，找藉口避開。", score: -1 },
+                    { text: "嘲笑他/她，並傳播他/她的困境。", score: -3 }
+                ]
+            },
+            {
+                question: "你在一家餐廳吃飯，發現服務員多收了你的錢，但數額不大。你會怎麼辦？",
+                options: [
+                    { text: "禮貌地指出錯誤，要求退還多收的錢。", score: 1 },
+                    { text: "覺得麻煩，算了，反正錢不多。", score: 0 },
+                    { text: "趁機大吵大鬧，甚至想得到更多賠償。", score: -2 },
+                    { text: "假裝沒發現，但心裡咒罵服務員。", score: -1 }
+                ]
+            },
+            {
+                question: "你看到一個小動物受傷了，躺在路邊。你會怎麼做？",
+                options: [
+                    { text: "盡力幫助它，帶它去獸醫那裡。", score: 3 },
+                    { text: "心裡有點難過，但覺得自己無能為力，走開了。", score: 0 },
+                    { text: "覺得它很可憐，但不想弄髒手，直接無視。", score: -1 },
+                    { text: "覺得它很礙眼，甚至想去踢一腳。", score: -3 }
+                ]
+            },
+            {
+                question: "你在工作中犯了一個錯誤，可能會影響到團隊的進度。你會怎麼做？",
+                options: [
+                    { text: "立即承認錯誤，並主動承擔責任，尋求解決方案。", score: 3 },
+                    { text: "雖然有點心虛，但還是試圖找藉口推脫責任。", score: -1 },
+                    { text: "堅決否認，把責任推給別人。", score: -2 },
+                    { text: "不僅不承認，還編造謊言掩蓋事實。", score: -3 }
+                ]
+            },
+            {
+                question: "你聽到別人議論一個你不喜歡的人的壞話。你會怎麼做？",
+                options: [
+                    { text: "保持沉默，不參與議論。", score: 1 },
+                    { text: "雖然不想參與，但心裡還是有點認同。", score: 0 },
+                    { text: "加入他們，添油加醋地說更多壞話。", score: -2 },
+                    { text: "主動散布更多謠言來詆毀他/她。", score: -3 }
+                ]
+            },
+            {
+                question: "當你面臨人生中的重大困境，感到迷茫無助時，你會將希望寄託於何處？",
+                options: [
+                    { text: "尋求那些以智慧、慈悲引導世人，並擁有清淨德行的教導與社群。", score: 3 },
+                    { text: "試圖依靠自己的力量克服，同時也會聽取各方建議，但沒有特別的依止對象。", score: 1 },
+                    { text: "轉向那些聲稱能用奇特力量或快速法術解決問題，但其行事與傳統正道相悖的說法。", score: -2 },
+                    { text: "完全投入於那些只追求世間名利、宣揚極端排他思想的團體，並盲目追隨。", score: -3 }
+                ]
+            },
+            {
+                question: "你擁有了一些財富，你會如何運用它們？",
+                options: [
+                    { text: "積極參與慈善事業，幫助有需要的人。", score: 3 },
+                    { text: "首先滿足自己的享受，然後再考慮一點點捐贈。", score: 1 },
+                    { text: "揮霍無度，只追求自己的感官享受。", score: -1 },
+                    { text: "囤積財富，不願幫助任何人。", score: -3 }
+                ]
+            },
+            {
+                question: "當你和別人產生意見分歧時，你會怎麼做？",
+                options: [
+                    { text: "保持冷靜，理性溝通，試圖理解對方的觀點。", score: 2 },
+                    { text: "雖然有些不快，但還是會忍住不發作。", score: 0 },
+                    { text: "堅持己見，甚至使用攻擊性語言。", score: -2 },
+                    { text: "完全不考慮對方感受，強迫對方接受自己的觀點。", score: -3 }
+                ]
+            },
+            {
+                question: "你在一個公共場所看到有人正在偷竊。你會怎麼做？",
+                options: [
+                    { text: "在確保自身安全的前提下，立即報警或尋求幫助。", score: 3 },
+                    { text: "感到害怕，假裝沒看見，趕緊離開。", score: 0 },
+                    { text: "覺得事不關己，繼續做自己的事情。", score: -1 },
+                    { text: "甚至想去分一杯羹。", score: -3 }
+                ]
+            },
+            {
+                question: "當你面對誘惑時，例如不正當的利益或機會。你會怎麼做？",
+                options: [
+                    { text: "堅決抵制誘惑，堅持正道。", score: 3 },
+                    { text: "內心掙扎，但最終還是選擇放棄。", score: 1 },
+                    { text: "欣然接受，認為這是自己的「機會」。", score: -2 },
+                    { text: "主動尋找類似的不正當機會。", score: -3 }
+                ]
+            },
+            {
+                question: "你聽到一些關於一位長期實踐慈悲與智慧、廣受尊敬的導師或其團體的負面傳聞，這些傳聞似乎有損其聲譽，且來源不明確。你會怎麼做？",
+                options: [
+                    { text: "保持冷靜，不輕信不實傳聞，並思考這位導師與其團體過往的善行與貢獻。", score: 3 },
+                    { text: "雖然聽到傳聞，但覺得與自己無關，不予理會。", score: 1 },
+                    { text: "感到好奇並私下打聽更多細節，甚至與他人分享這些傳聞。", score: -2 },
+                    { text: "立即相信並廣為傳播這些傳聞，甚至添油加醋。", score: -3 }
+                ]
+            },
+            {
+                question: "當你感到壓力很大，情緒低落時。你會怎麼做？",
+                options: [
+                    { text: "尋找健康的方式排解，例如運動、冥想或與人傾訴。", score: 2 },
+                    { text: "獨自承受，但心情持續不好。", score: 0 },
+                    { text: "用不健康的習慣來麻痺自己，例如酗酒或暴飲暴食。", score: -1 },
+                    { text: "把負面情緒發洩在周圍的人身上。", score: -3 }
+                ]
+            },
+            {
+                question: "你看到一個陌生人遭遇困境，例如迷路或需要幫助。你會怎麼做？",
+                options: [
+                    { text: "主動上前詢問，並盡力提供幫助。", score: 3 },
+                    { text: "心裡有點想幫忙，但擔心麻煩，猶豫後還是放棄。", score: 0 },
+                    { text: "漠不關心，甚至覺得他們活該。", score: -1 },
+                    { text: "趁機利用對方的困境來謀取私利。", score: -3 }
+                ]
+            },
+            {
+                question: "你對某個人產生了嫉妒之心。你會怎麼做？",
+                options: [
+                    { text: "認識到自己的嫉妒，努力轉化為祝福和學習。", score: 2 },
+                    { text: "雖然嫉妒，但還是會克制自己的行為。", score: 0 },
+                    { text: "暗中詆毀對方，希望他們失敗。", score: -2 },
+                    { text: "想方設法去破壞對方。", score: -3 }
+                ]
+            },
+            {
+                question: "你收到了一份對你的不公正批評。你會怎麼做？",
+                options: [
+                    { text: "冷靜分析，如果是自己的問題則虛心接受並改正；如果不是則解釋清楚。", score: 2 },
+                    { text: "感到委屈，但選擇忍氣吞聲。", score: 0 },
+                    { text: "馬上反擊，甚至惡語相向。", score: -2 },
+                    { text: "懷恨在心，伺機報復。", score: -3 }
+                ]
+            },
+            {
+                question: "你在公共交通工具上看到有老弱病殘的人沒有座位。你會怎麼做？",
+                options: [
+                    { text: "立刻起身讓座。", score: 3 },
+                    { text: "內心掙扎，但最終還是讓座了。", score: 1 },
+                    { text: "假裝沒看見，繼續坐著。", score: -1 },
+                    { text: "覺得他們礙事，希望他們快點離開。", score: -2 }
+                ]
+            },
+            {
+                question: "你對一個你不了解的事情或人，產生了先入為主的偏見。你會怎麼做？",
+                options: [
+                    { text: "意識到偏見，主動去了解真相，糾正自己的看法。", score: 2 },
+                    { text: "雖然意識到是偏見，但很難改變。", score: 0 },
+                    { text: "堅持自己的偏見，甚至以此來判斷一切。", score: -2 },
+                    { text: "積極傳播自己的偏見，誤導他人。", score: -3 }
+                ]
+            },
+            {
+                question: "當你取得成就時，你會怎麼做？",
+                options: [
+                    { text: "謙遜地看待自己的成就，並感謝幫助過你的人。", score: 2 },
+                    { text: "雖然高興，但還是會保持低調。", score: 0 },
+                    { text: "驕傲自滿，到處炫耀。", score: -2 },
+                    { text: "輕視他人，認為自己高人一等。", score: -3 }
+                ]
+            },
+            {
+                question: "你對生命和死亡的看法是什麼？",
+                options: [
+                    { text: "生命是珍貴的，應該珍惜當下，多做善事，為未來累積福報。", score: 3 },
+                    { text: "雖然有點擔心死亡，但還是活在當下。", score: 1 },
+                    { text: "覺得死亡很遙遠，無需考慮，只顧及眼前享受。", score: -1 },
+                    { text: "認為生命毫無意義，甚至有輕生念頭。", score: -3 }
+                ]
+            }
+        ];
+
+        // 來生境界的判斷標準和描述 (已更新為更精確的描述，融合十善惡業與皈依)
+        const rebirthOutcomes = [
+            {
+                range: [-60, -40],
+                title: "地獄道 (Naraka) - 極重不善業之苦果",
+                description: "你的業力傾向顯示出極度的瞋恨、暴力與不善行為，累積了極深重的不善業。這通常源於對生命極度的輕蔑、對他人財物的強行侵佔、不正當的身體慾望、以及惡毒的言語和錯誤的見解。例如可能投生於<strong>八熱地獄</strong>之一，如「等活地獄」（因傷害生靈業重）、「黑繩地獄」（因強烈瞋恨與破壞正見業重）或更深重的「阿鼻地獄」（因造作極端惡劣的行為）。此境界充滿無盡的苦楚與煎熬，是為償還過去的極端不善行為而生。<strong>此等無盡苦果，若能深生怖畏，當下便能發願斷惡修善，至心依止真理的教導與智慧的社群，培養慈悲心。</strong>"
+            },
+            {
+                range: [-39, -20],
+                title: "餓鬼道 (Preta) - 貪婪慳吝之報",
+                description: "你的業力傾向呈現出強烈的貪婪、吝嗇與永不滿足的慾望。因此感得飢渴、貧乏之苦。例如可能成為<strong>無財餓鬼</strong>（如炬口、針口、臭口餓鬼，因過去的口業或極度吝嗇而難以進食）、或<strong>少財餓鬼</strong>（飲食難得，因布施微少而福報不足）、<strong>多財餓鬼</strong>（雖有飲食，但因福報淺薄而難享用）等。是因生前對財物與慾望的過度執著。<strong>認識此道之苦，方能發心多行布施，放下執著，培養知足常樂的心，並誠心尋求究竟智慧的指引與庇護。</strong>"
+            },
+            {
+                range: [-19, -5],
+                title: "畜生道 (Tiryagyoni) - 無明愚痴之苦",
+                description: "你的業力傾向顯示出較多的愚痴、執著與缺乏智慧。因此感得無明、被役使或弱肉強食之苦。根據業力輕重，可能投生為<strong>毒蟲猛獸</strong>（如虎豹、蛇蠍，因過去的瞋恨和心智蒙蔽）；或為<strong>役使之牲畜</strong>（如牛馬豬狗，因愚痴和被他人奴役，未能辨別因果）；亦或是<strong>飛禽走獸</strong>等。是因生前缺乏對正確道理的理解與辨別。<strong>此道之無明困縛，正提醒我等應深生怖畏，多聞正法，培養智慧，增長正念，遠離愚痴，並以真理的教導為究竟依止。</strong>"
+            },
+            {
+                range: [-4, 10],
+                title: "阿修羅道 (Asura) - 傲慢瞋恚之果",
+                description: "你的業力傾向善惡夾雜，雖有善行但伴隨著強烈的傲慢、嫉妒與好鬥之心。此境界有福報但難享安樂，常與天人爭鬥，因好勝心極強，無法安忍。是因生前雖行善但心性未純，常懷瞋恚與傲慢。建議調伏瞋恚，去除傲慢，培養謙遜與忍辱，並真誠地尋求清淨的教導與指引。"
+            },
+            {
+                range: [11, 30],
+                title: "人道 (Manuṣya) - 平衡善行之基礎",
+                description: "你的業力傾向均衡，善惡參半，傾向於在人道中獲得較為平和的生命。此境界是積累善行、守持清淨行為的結果，例如對生命有所尊重、對他人財物有所不取、言語柔和、心意善良等。人道有機會接觸佛法，繼續修行。根據分數高低，可能感得<strong>貧賤多病之人身</strong>，或<strong>富貴康樂之身</strong>。<strong>能在此道，更應珍視接觸真理教法的寶貴機會，深信覺悟者與其純正傳承團體的功德，誠心依止，精進修行，永不退轉。</strong>"
+            },
+            {
+                range: [31, 45],
+                title: "欲界天 (Kāmadhātu Deva) - 廣行善業之報",
+                description: "你的業力傾向顯示出較多的善行、持戒與布施。這通常源於對眾生的廣大慈悲、慷慨分享財物、以及對清淨行為的堅守。此境界眾生享受世間五欲的妙樂，例如投生於<strong>四大王天、忉利天、夜摩天、兜率天、化樂天或他化自在天</strong>等。是因生前廣修福德。然欲樂終非常久，仍受生死輪迴之苦。<strong>唯有對究竟的智慧與其傳承生起更堅定之信心，精進禪定與智慧，方能究竟解脫。</strong>"
+            },
+            {
+                range: [46, 60],
+                title: "色界天 (Rūpadhātu Deva) - 禪定與清淨心意之極果",
+                description: "你的業力傾向顯示出極高的善行、持戒與禪定功夫。這主要來自於對心念的極致調伏、對禪定境界的深切追求，以及超越世俗慾望的清淨心意。此境界眾生超越欲樂，享受禪定之樂，例如投生於<strong>初禪天、二禪天、三禪天、四禪天</strong>等，遠離欲界之苦，感受禪定之樂。此處善業極為純淨，多因精勤修習禪定，並具備純淨的對正道的理解。這是出離三界輪迴的極近之緣，提醒你應繼續深入禪修，培養無漏智慧，追求究竟解脫。"
+            }
+        ];
+
+        // 初始化遊戲
+        function initializeGame() {
+            startScreen.classList.remove('hidden');
+            questionScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            currentQuestionIndex = 0;
+            totalScore = 0;
+            selectedOptionScore = null;
+            nextButton.classList.add('hidden'); // 確保開始時下一題按鈕是隱藏的
+        }
+
+        // 顯示當前問題
+        function displayQuestion() {
+            // 清空選項
+            optionsContainer.innerHTML = '';
+            // 隱藏下一題按鈕，直到選中選項
+            nextButton.classList.add('hidden');
+
+            // 顯示問題編號和文本
+            questionNumberSpan.textContent = currentQuestionIndex + 1;
+            questionText.textContent = questions[currentQuestionIndex].question;
+
+            // 動態創建選項按鈕
+            questions[currentQuestionIndex].options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.text; // 使用 innerHTML 以便渲染強強調標籤
+                button.classList.add('option-button', 'rounded-xl', 'text-lg', 'font-medium', 'block'); // 添加 Tailwind class
+                button.dataset.score = option.score; // 將分數存儲在數據屬性中
+
+                button.addEventListener('click', () => {
+                    // 移除所有選項的選中狀態
+                    document.querySelectorAll('.option-button').forEach(btn => {
+                        btn.style.borderColor = 'transparent'; /* 重置邊框 */
+                        btn.style.backgroundColor = '#e2e8f0'; /* 重置背景色 */
+                        btn.style.color = '#4a5568'; /* 重置文字顏色 */
+                    });
+
+                    // 設置當前選中選項的樣式
+                    button.style.borderColor = '#4299e1'; /* 選中邊框顏色 */
+                    button.style.backgroundColor = '#bee3f8'; /* 選中背景色 */
+                    button.style.color = '#2c5282'; /* 選中文字顏色 */
+
+                    selectedOptionScore = parseInt(button.dataset.score); // 更新暫存分數
+                    nextButton.classList.remove('hidden'); // 顯示下一題按鈕
+                });
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // 處理選項選擇並前往下一題
+        function handleNextQuestion() {
+            if (selectedOptionScore !== null) {
+                totalScore += selectedOptionScore; // 累加分數
+                selectedOptionScore = null; // 重置暫存分數
+
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion(); // 顯示下一題
+                } else {
+                    showResult(); // 顯示結果
+                }
+            } else {
+                // 如果沒有選擇選項，可以給出提示 (這裡為了簡潔暫不顯示彈窗)
+                console.log("請選擇一個選項。");
+            }
+        }
+
+        // 顯示結果
+        function showResult() {
+            questionScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            let finalOutcome = null;
+            // 遍歷所有結果，找到符合分數範圍的境界
+            for (const outcome of rebirthOutcomes) {
+                if (totalScore >= outcome.range[0] && totalScore <= outcome.range[1]) {
+                    finalOutcome = outcome;
+                    break;
+                }
+            }
+
+            // 如果沒有找到精確匹配的範圍，則根據分數高低給出最接近的極端結果
+            if (!finalOutcome) {
+                if (totalScore < rebirthOutcomes[0].range[0]) {
+                    finalOutcome = rebirthOutcomes[0]; // 最低分數對應的地獄道
+                } else {
+                    finalOutcome = rebirthOutcomes[rebirthOutcomes.length - 1]; // 最高分數對應的色界天
+                }
+            }
+
+            rebirthTitle.textContent = finalOutcome.title;
+            rebirthDescription.innerHTML = finalOutcome.description; // 使用 innerHTML 以便渲染 strong 標籤
+        }
+
+        // 重新開始遊戲
+        function restartGame() {
+            initializeGame();
+        }
+
+        // 事件監聽器
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            displayQuestion();
+        });
+        nextButton.addEventListener('click', handleNextQuestion);
+        restartButton.addEventListener('click', restartGame);
+
+        // 頁面加載時初始化遊戲
+        window.onload = initializeGame;
+
+    </script>
+</body>
+</html>
